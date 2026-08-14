@@ -148,6 +148,25 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;justify-content
 .jmname{color:rgba(255,255,255,.8);font-size:1rem;margin-top:.4rem;}
 .jnote{color:rgba(255,255,255,.45);font-size:.82rem;font-style:italic;margin-top:1rem;line-height:1.6;}
 
+/* DONATE — PROGRESS BAR */
+.pbwrap{margin-bottom:1.2rem;}
+.pbtrack{width:100%;height:10px;background:#f0e5ff;border-radius:10px;overflow:hidden;}
+.pbfill{height:100%;background:linear-gradient(to right,var(--rose),var(--gold));border-radius:10px;transition:width .4s ease;}
+.pbmeta{display:flex;justify-content:space-between;font-size:.78rem;color:var(--soft);margin-top:.4rem;font-weight:700;}
+
+/* DONATE — STATS STRIP */
+.donstats{display:flex;gap:1.2rem;justify-content:center;flex-wrap:wrap;margin:0 auto 2.5rem;max-width:900px;}
+.donstat{background:rgba(255,255,255,.85);border:1px solid rgba(200,146,42,.18);border-radius:16px;padding:1rem 1.8rem;text-align:center;min-width:170px;}
+.donstat .dsn{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:var(--mid);}
+.donstat .dsl{font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-top:.2rem;}
+
+/* DONATE — bKASH INSTRUCTION BOX */
+.bkbox{background:linear-gradient(135deg,rgba(226,19,110,.08),rgba(226,19,110,.03));border:1.5px dashed #e2136e;border-radius:16px;padding:1.2rem 1.4rem;margin-bottom:1.3rem;}
+.bkbox .bktit{font-family:'Playfair Display',serif;font-weight:700;color:#c4004f;font-size:1rem;margin-bottom:.4rem;}
+.bkbox .bknum{font-size:1.35rem;font-weight:900;color:#e2136e;letter-spacing:.03em;}
+.bkbox .bktype{font-size:.78rem;color:#a04070;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-left:.4rem;}
+.bkbox ol{margin:.7rem 0 0 1.2rem;font-size:.88rem;color:#6a4480;line-height:1.75;}
+
 /* FORM SHARED */
 .fg{margin-bottom:1.2rem;}
 .fl{display:block;font-size:.82rem;font-weight:700;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:.4rem;}
@@ -158,12 +177,18 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;justify-content
 /* MODAL */
 .mov{display:none;position:fixed;inset:0;background:rgba(10,0,25,.75);z-index:500;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px);}
 .mov.open{display:flex;}
-.modal{background:linear-gradient(160deg,#fdf8ff,#f5e8ff);border-radius:24px;padding:2.5rem;max-width:480px;width:100%;box-shadow:0 30px 80px rgba(30,10,56,.4);position:relative;animation:mp .3s ease both;}
+.modal{background:linear-gradient(160deg,#fdf8ff,#f5e8ff);border-radius:24px;padding:2.5rem;max-width:480px;width:100%;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 30px 80px rgba(30,10,56,.4);position:relative;animation:mp .3s ease both;}
 @keyframes mp{from{opacity:0;transform:scale(.9) translateY(20px);}to{opacity:1;transform:scale(1) translateY(0);}}
-.mcl{position:absolute;top:1.2rem;right:1.5rem;background:none;border:none;font-size:1.5rem;color:var(--soft);cursor:pointer;}
-.mtit{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--deep);font-weight:700;margin-bottom:.3rem;}
+.mcl{position:absolute;top:1.1rem;right:1.3rem;background:rgba(255,255,255,.7);border-radius:50%;width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;border:none;font-size:1.3rem;color:var(--soft);cursor:pointer;z-index:2;line-height:1;}
+.mtit{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--deep);font-weight:700;margin-bottom:.3rem;padding-right:1.8rem;}
 .msub{font-style:italic;color:var(--soft);margin-bottom:1.5rem;font-size:1rem;}
 .rsucc{display:none;text-align:center;padding:1.5rem;}
+
+@media(max-width:600px){
+  .modal{padding:1.5rem 1.3rem;max-height:92vh;border-radius:18px;}
+  .mtit{font-size:1.3rem;}
+}
+
 
 /* ADMIN FAB */
 .afab{position:fixed;bottom:1.8rem;right:1.8rem;z-index:300;background:linear-gradient(135deg,var(--deep),var(--mid));color:white;border:none;width:52px;height:52px;border-radius:50%;font-size:1.3rem;cursor:pointer;box-shadow:0 6px 20px rgba(30,10,56,.45);transition:transform .3s;display:flex;align-items:center;justify-content:center;text-decoration:none;}

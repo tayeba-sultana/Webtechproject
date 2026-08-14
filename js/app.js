@@ -31,7 +31,23 @@ const DEFAULT_DB = {
   midCounter: 0,
   admins: [
     {id:'a1', username:'admin', password:'secmuslimah2025', name:'Super Admin', createdAt:'Initial Setup'}
-  ]
+  ],
+  campaigns: [
+    {id:'c1', type:'event', title:'Muslimah Summit', desc:'Help us fund venue, guest speakers and logistics for our flagship annual Muslimah Summit — a day of talks, workshops and sisterhood.', goal:20000, status:'active', createdAt:'Initial Setup'},
+    {id:'c2', type:'activity', title:'Fiqh & Faith Intensive', desc:'Support our Fiqh & Faith Intensive — a focused learning program covering fiqh, aqeedah and practical deen for sisters.', goal:10000, status:'active', createdAt:'Initial Setup'}
+  ],
+  causes: [
+    {id:'ca1', icon:'🌊', title:'Flood Relief Fund', desc:'Emergency support — food, clean water and shelter essentials — for families affected by flooding.', goal:20000, status:'active', createdAt:'Initial Setup'},
+    {id:'ca2', icon:'🕊️', title:'Palestine Relief Fund', desc:'Contributing towards humanitarian relief efforts for our brothers and sisters in Palestine.', goal:30000, status:'active', createdAt:'Initial Setup'},
+    {id:'ca3', icon:'🧸', title:'Orphanage Support Fund', desc:'Supporting local orphanages with essentials, education costs and everyday care for the children.', goal:15000, status:'active', createdAt:'Initial Setup'}
+  ],
+  donations: [],
+  clothDrives: [
+    {id:'cd1', season:'winter', title:'Winter Clothes Collection 2025', desc:'Collecting warm clothes, blankets and shawls to distribute to families in need around Sylhet.', dropoff:'SEC Girls Common Room, Room 204', deadline:'2025-12-15', status:'active'},
+    {id:'cd2', season:'summer', title:'Summer Clothes Collection 2025', desc:'Collecting lightweight, gently-used clothing for families in need during the summer months.', dropoff:'SEC Girls Common Room, Room 204', deadline:'2026-06-30', status:'active'}
+  ],
+  clothPledges: [],
+  settings: { bkashNumber:'01712-345678', bkashType:'Personal' }
 };
 
 /* ── LOAD / SAVE ── */
@@ -44,6 +60,13 @@ function loadDB(){
       if(!Array.isArray(parsed.admins) || !parsed.admins.length){
         parsed.admins = JSON.parse(JSON.stringify(DEFAULT_DB.admins));
       }
+      // Migration: older saved data (before donations/fundraising support) won't have these yet.
+      if(!Array.isArray(parsed.campaigns))   parsed.campaigns   = JSON.parse(JSON.stringify(DEFAULT_DB.campaigns));
+      if(!Array.isArray(parsed.causes))      parsed.causes      = JSON.parse(JSON.stringify(DEFAULT_DB.causes));
+      if(!Array.isArray(parsed.donations))   parsed.donations   = [];
+      if(!Array.isArray(parsed.clothDrives)) parsed.clothDrives = JSON.parse(JSON.stringify(DEFAULT_DB.clothDrives));
+      if(!Array.isArray(parsed.clothPledges))parsed.clothPledges= [];
+      if(!parsed.settings) parsed.settings = JSON.parse(JSON.stringify(DEFAULT_DB.settings));
       return parsed;
     }
   }catch(e){ console.warn('Could not read local storage, starting fresh.', e); }
@@ -157,6 +180,165 @@ function swTab(t,btn){
 }
 
 /* ════════════════════════════════════
+   DONATIONS & FUNDRAISING HELPERS
+   ════════════════════════════════════ */
+function raisedFor(targetId){
+  return DB.donations.filter(d=>d.targetId===targetId && d.status==='verified')
+    .reduce((s,d)=>s+Number(d.amount||0),0);
+}
+
+/* ════════════════════════════════════
+   RENDER: FUNDRAISING CAMPAIGNS (donate.html)
+   ════════════════════════════════════ */
+function renderCampaigns(){
+  const el = document.getElementById('campGrid');
+  if(!el) return;
+  const active = DB.campaigns.filter(c=>c.status==='active');
+  if(!active.length){ el.innerHTML='<div class="noevent">No active fundraising campaigns right now. Check back soon! 🌙</div>'; return; }
+  el.innerHTML = active.map(c=>{
+    const raised = raisedFor(c.id);
+    const pct = c.goal ? Math.min(100, Math.round(raised/c.goal*100)) : 0;
+    return `
+    <div class="ecard">
+      <div class="ebar"></div>
+      <div class="ebody">
+        <span class="edate">${c.type==='event'?'📅 Event Fund':'🤝 Activity Fund'}</span>
+        <div class="etitle">${c.title}</div>
+        <p class="edesc">${c.desc}</p>
+        <div class="pbwrap">
+          <div class="pbtrack"><div class="pbfill" style="width:${pct}%"></div></div>
+          <div class="pbmeta"><span>৳${raised.toLocaleString()} raised</span><span>Goal ৳${c.goal.toLocaleString()}</span></div>
+        </div>
+        <button class="breg" onclick="openDonate('campaign','${c.id}','${c.title.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">Donate via bKash 💗</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ════════════════════════════════════
+   RENDER: DONATION CAUSES (donate.html)
+   ════════════════════════════════════ */
+function renderCauses(){
+  const el = document.getElementById('causeGrid');
+  if(!el) return;
+  const active = DB.causes.filter(c=>c.status==='active');
+  if(!active.length){ el.innerHTML='<div class="noevent">No active donation causes right now. Check back soon! 🌙</div>'; return; }
+  el.innerHTML = active.map(c=>{
+    const raised = raisedFor(c.id);
+    const pct = c.goal ? Math.min(100, Math.round(raised/c.goal*100)) : 0;
+    return `
+    <div class="ecard">
+      <div class="ebar"></div>
+      <div class="ebody">
+        <span class="edate">${c.icon||'🤲'} Donation Cause</span>
+        <div class="etitle">${c.title}</div>
+        <p class="edesc">${c.desc}</p>
+        <div class="pbwrap">
+          <div class="pbtrack"><div class="pbfill" style="width:${pct}%"></div></div>
+          <div class="pbmeta"><span>৳${raised.toLocaleString()} raised</span><span>Goal ৳${c.goal.toLocaleString()}</span></div>
+        </div>
+        <button class="breg" onclick="openDonate('cause','${c.id}','${c.title.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">Donate via bKash 💗</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ════════════════════════════════════
+   RENDER: CLOTHES COLLECTION DRIVES (donate.html)
+   ════════════════════════════════════ */
+function renderClothDrives(){
+  const el = document.getElementById('cdGrid');
+  if(!el) return;
+  const active = DB.clothDrives.filter(d=>d.status==='active');
+  if(!active.length){ el.innerHTML='<div class="noevent">No active clothes collection drives right now. Check back soon! 🌙</div>'; return; }
+  el.innerHTML = active.map(d=>`
+    <div class="ecard">
+      <div class="ebar" style="background:linear-gradient(to right,${d.season==='winter'?'#4a1880,#1e0a38':'var(--gold),var(--rose)'})"></div>
+      <div class="ebody">
+        <span class="edate">${d.season==='winter'?'❄️ Winter Drive':'☀️ Summer Drive'}</span>
+        <div class="etitle">${d.title}</div>
+        <p class="edesc">${d.desc}</p>
+        <div class="emeta"><span>📍 ${d.dropoff||'TBA'}</span><span>⏳ Until ${fmtDate(d.deadline)}</span></div>
+        <button class="breg" onclick="openPledge('${d.id}','${d.title.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">🧥 Pledge to Donate Clothes</button>
+      </div>
+    </div>`).join('');
+}
+
+/* ════════════════════════════════════
+   RENDER: DONATE PAGE STATS
+   ════════════════════════════════════ */
+function renderDonateStats(){
+  const el = document.getElementById('donStatWrap');
+  if(!el) return;
+  const genEl = document.getElementById('genRaised');
+  const campEl = document.getElementById('campRaisedTotal');
+  if(genEl)  genEl.textContent  = '৳'+DB.causes.reduce((s,c)=>s+raisedFor(c.id),0).toLocaleString();
+  if(campEl) campEl.textContent = '৳'+DB.campaigns.reduce((s,c)=>s+raisedFor(c.id),0).toLocaleString();
+}
+
+/* ════════════════════════════════════
+   DONATION MODAL (campaign or cause)
+   ════════════════════════════════════ */
+let curDonKind='cause', curDonTargetId='', curDonTargetTitle='';
+function openDonate(kind, targetId, targetTitle){
+  curDonKind=kind; curDonTargetId=targetId; curDonTargetTitle=targetTitle;
+  document.getElementById('donTitle').textContent = `Donate to: ${targetTitle}`;
+  document.getElementById('donBkashNo').textContent = DB.settings.bkashNumber;
+  document.getElementById('donBkashType').textContent = DB.settings.bkashType;
+  document.getElementById('donF').style.display='block';
+  document.getElementById('donSucc').style.display='none';
+  ['dName','dPhone','dSender','dTrx','dAmt','dNote'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('donMov').classList.add('open');
+}
+function closeDonate(){ document.getElementById('donMov').classList.remove('open'); }
+function submitDonation(){
+  const n=document.getElementById('dName').value.trim();
+  const p=document.getElementById('dPhone').value.trim();
+  const sender=document.getElementById('dSender').value.trim();
+  const trx=document.getElementById('dTrx').value.trim();
+  const amt=document.getElementById('dAmt').value.trim();
+  if(!n||!p||!sender||!trx||!amt||Number(amt)<=0){ alert('Please fill in Name, Phone, bKash Number, Transaction ID and a valid Amount.'); return; }
+  DB.donations.unshift({
+    id:uid(), kind:curDonKind, targetId:curDonTargetId, targetTitle:curDonTargetTitle,
+    name:n, phone:p, bkashNumber:sender, trxId:trx, amount:Number(amt),
+    note:document.getElementById('dNote').value.trim(),
+    status:'pending', time:new Date().toLocaleString()
+  });
+  saveDB();
+  document.getElementById('donF').style.display='none';
+  document.getElementById('donSucc').style.display='block';
+}
+
+/* ════════════════════════════════════
+   CLOTHES PLEDGE MODAL
+   ════════════════════════════════════ */
+let curPledgeDriveId='', curPledgeDriveTitle='';
+function openPledge(driveId, driveTitle){
+  curPledgeDriveId=driveId; curPledgeDriveTitle=driveTitle;
+  document.getElementById('pldTitle').textContent = driveTitle;
+  document.getElementById('pldF').style.display='block';
+  document.getElementById('pldSucc').style.display='none';
+  ['plName','plPhone','plItems','plQty','plNote'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('pldMov').classList.add('open');
+}
+function closePledge(){ document.getElementById('pldMov').classList.remove('open'); }
+function submitPledge(){
+  const n=document.getElementById('plName').value.trim();
+  const p=document.getElementById('plPhone').value.trim();
+  const items=document.getElementById('plItems').value.trim();
+  if(!n||!p||!items){ alert('Please fill in Name, Phone, and what items you would like to donate.'); return; }
+  DB.clothPledges.unshift({
+    id:uid(), driveId:curPledgeDriveId, driveTitle:curPledgeDriveTitle,
+    name:n, phone:p, items:items, qty:document.getElementById('plQty').value.trim(),
+    note:document.getElementById('plNote').value.trim(),
+    status:'pending', time:new Date().toLocaleString()
+  });
+  saveDB();
+  document.getElementById('pldF').style.display='none';
+  document.getElementById('pldSucc').style.display='block';
+}
+
+/* ════════════════════════════════════
    EVENT REGISTRATION (events.html)
    ════════════════════════════════════ */
 let curEvId='', curEvName='';
@@ -212,7 +394,15 @@ document.addEventListener('DOMContentLoaded', ()=>{
   renderEvents();
   renderNotices();
   renderResources();
+  renderCampaigns();
+  renderCauses();
+  renderClothDrives();
+  renderDonateStats();
 
   const regMov = document.getElementById('regMov');
   if(regMov){ regMov.onclick = e=>{ if(e.target===e.currentTarget) closeReg(); }; }
+  const donMov = document.getElementById('donMov');
+  if(donMov){ donMov.onclick = e=>{ if(e.target===e.currentTarget) closeDonate(); }; }
+  const pldMov = document.getElementById('pldMov');
+  if(pldMov){ pldMov.onclick = e=>{ if(e.target===e.currentTarget) closePledge(); }; }
 });

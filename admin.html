@@ -20,6 +20,7 @@
     <li><a href="events.html">Events</a></li>
     <li><a href="notices.html">Notices</a></li>
     <li><a href="resources.html">Resources</a></li>
+    <li><a href="donate.html">Donate</a></li>
     <li><a href="join.html">Join Us</a></li>
   </ul>
   <button class="hbg" id="hamburger"><span></span><span></span><span></span></button>
@@ -59,6 +60,9 @@
       <button class="atab" onclick="aTab('aevents',this)">📅 Manage Events</button>
       <button class="atab" onclick="aTab('anotices',this)">📌 Manage Notices</button>
       <button class="atab" onclick="aTab('aresources',this)">📖 Manage Resources</button>
+      <button class="atab" onclick="aTab('fundraising',this)">💰 Fundraising <span class="bdg" id="bdgD">0</span></button>
+      <button class="atab" onclick="aTab('cloth',this)">🧥 Clothes Collection <span class="bdg" id="bdgP">0</span></button>
+      <button class="atab" onclick="aTab('payset',this)">💳 Payment Settings</button>
       <button class="atab" onclick="aTab('aadmins',this)">🔑 Manage Admins <span class="bdg" id="bdgA">0</span></button>
     </div>
 
@@ -73,6 +77,9 @@
           <div class="stat"><div class="stn" id="dN">0</div><div class="stl">Notices</div></div>
           <div class="stat"><div class="stn" id="dRes">0</div><div class="stl">Resources</div></div>
           <div class="stat"><div class="stn" id="dAdm">0</div><div class="stl">Admins</div></div>
+          <div class="stat"><div class="stn" id="dDon">৳0</div><div class="stl">Verified Donations</div></div>
+          <div class="stat"><div class="stn" id="dPend">0</div><div class="stl">Pending Donations</div></div>
+          <div class="stat"><div class="stn" id="dPledge">0</div><div class="stl">Cloth Pledges</div></div>
         </div>
         <div class="tw">
           <div class="tbar"><span class="ttit">📌 Recent Activity</span></div>
@@ -180,6 +187,105 @@
             <table><thead><tr><th>Type</th><th>Source/Title</th><th>Preview</th><th></th></tr></thead><tbody id="rsAdTb"></tbody></table>
           </div>
           <div class="empty" id="rsAdEmp">📖 No resources yet.</div>
+        </div>
+      </div>
+
+      <!-- FUNDRAISING (CAMPAIGNS + DONATIONS) -->
+      <div class="asec" id="as-fundraising">
+        <div class="aform">
+          <div class="aftit">➕ Launch New Fundraising Campaign</div>
+          <div class="frow">
+            <div class="fg"><label class="fl">Campaign Title *</label><input class="ai" id="cpT" placeholder="e.g. Winter Relief Drive Fundraiser"></div>
+            <div class="fg"><label class="fl">Type</label><select class="ai" id="cpTy"><option value="activity">🤝 Activity / Cause</option><option value="event">📅 Event</option></select></div>
+          </div>
+          <div class="fg"><label class="fl">Description</label><textarea class="ai" id="cpDs" placeholder="What is this fundraiser for?"></textarea></div>
+          <div class="fg"><label class="fl">Goal Amount (৳) *</label><input class="ai" id="cpG" type="number" min="1" placeholder="e.g. 15000"></div>
+          <button class="bsm bp" onclick="addCampaign()" style="padding:.55rem 1.4rem;margin-top:.4rem;">✦ Launch Campaign</button>
+        </div>
+        <div class="tw">
+          <div class="tbar"><span class="ttit">All Campaigns</span></div>
+          <div class="tscroll">
+            <table><thead><tr><th>Title</th><th>Type</th><th>Goal</th><th>Raised</th><th>Status</th><th></th></tr></thead><tbody id="cpAdTb"></tbody></table>
+          </div>
+          <div class="empty" id="cpAdEmp">💰 No campaigns yet. Add one above!</div>
+        </div>
+
+        <div class="aform">
+          <div class="aftit">➕ Add New Donation Cause</div>
+          <div class="frow">
+            <div class="fg"><label class="fl">Cause Title *</label><input class="ai" id="caT" placeholder="e.g. Flood Relief Fund"></div>
+            <div class="fg"><label class="fl">Icon (emoji)</label><input class="ai" id="caIc" placeholder="e.g. 🌊" maxlength="4"></div>
+          </div>
+          <div class="fg"><label class="fl">Description</label><textarea class="ai" id="caDs" placeholder="What is this cause for?"></textarea></div>
+          <div class="fg"><label class="fl">Goal Amount (৳) *</label><input class="ai" id="caG" type="number" min="1" placeholder="e.g. 20000"></div>
+          <button class="bsm bp" onclick="addCause()" style="padding:.55rem 1.4rem;margin-top:.4rem;">✦ Add Donation Cause</button>
+        </div>
+        <div class="tw">
+          <div class="tbar"><span class="ttit">All Donation Causes</span></div>
+          <div class="tscroll">
+            <table><thead><tr><th>Title</th><th>Goal</th><th>Raised</th><th>Status</th><th></th></tr></thead><tbody id="caAdTb"></tbody></table>
+          </div>
+          <div class="empty" id="caAdEmp">🤲 No donation causes yet. Add one above!</div>
+        </div>
+
+        <div class="tw">
+          <div class="tbar">
+            <span class="ttit">💗 bKash Donations Received</span>
+            <div class="tbtns"><button class="bsm ba" onclick="expCSV('donations')">⬇ Export CSV</button></div>
+          </div>
+          <div class="tscroll">
+            <table><thead><tr><th>#</th><th>For</th><th>Donor</th><th>Phone</th><th>bKash No.</th><th>Trx ID</th><th>Amount</th><th>Status</th><th>Time</th><th></th></tr></thead><tbody id="donTb"></tbody></table>
+          </div>
+          <div class="empty" id="donEmp">🤲 No donations submitted yet.</div>
+        </div>
+      </div>
+
+      <!-- CLOTHES COLLECTION (DRIVES + PLEDGES) -->
+      <div class="asec" id="as-cloth">
+        <div class="aform">
+          <div class="aftit">➕ Start New Clothes Collection Drive</div>
+          <div class="frow">
+            <div class="fg"><label class="fl">Season</label><select class="ai" id="cdSe"><option value="winter">❄️ Winter</option><option value="summer">☀️ Summer</option></select></div>
+            <div class="fg"><label class="fl">Drive Title *</label><input class="ai" id="cdT" placeholder="e.g. Winter Clothes Collection 2025"></div>
+          </div>
+          <div class="fg"><label class="fl">Description</label><textarea class="ai" id="cdDs" placeholder="Details about this drive..."></textarea></div>
+          <div class="frow">
+            <div class="fg"><label class="fl">Drop-off Location</label><input class="ai" id="cdLo" placeholder="e.g. SEC Girls Common Room"></div>
+            <div class="fg"><label class="fl">Deadline</label><input class="ai" id="cdDl" type="date"></div>
+          </div>
+          <button class="bsm bp" onclick="addClothDrive()" style="padding:.55rem 1.4rem;margin-top:.4rem;">✦ Start Drive</button>
+        </div>
+        <div class="tw">
+          <div class="tbar"><span class="ttit">All Drives</span></div>
+          <div class="tscroll">
+            <table><thead><tr><th>Title</th><th>Season</th><th>Drop-off</th><th>Deadline</th><th>Status</th><th></th></tr></thead><tbody id="cdAdTb"></tbody></table>
+          </div>
+          <div class="empty" id="cdAdEmp">🧥 No drives yet. Start one above!</div>
+        </div>
+        <div class="tw">
+          <div class="tbar">
+            <span class="ttit">🧥 Clothes Pledges</span>
+            <div class="tbtns"><button class="bsm ba" onclick="expCSV('pledges')">⬇ Export CSV</button></div>
+          </div>
+          <div class="tscroll">
+            <table><thead><tr><th>#</th><th>Drive</th><th>Name</th><th>Phone</th><th>Items</th><th>Qty</th><th>Status</th><th>Time</th><th></th></tr></thead><tbody id="plTb"></tbody></table>
+          </div>
+          <div class="empty" id="plEmp">🧥 No pledges yet.</div>
+        </div>
+      </div>
+
+      <!-- PAYMENT SETTINGS -->
+      <div class="asec" id="as-payset">
+        <div class="aform">
+          <div class="aftit">💳 bKash Payment Settings</div>
+          <div class="frow">
+            <div class="fg"><label class="fl">bKash Number *</label><input class="ai" id="bkNo" placeholder="e.g. 01712-345678"></div>
+            <div class="fg"><label class="fl">Account Type</label><select class="ai" id="bkTy"><option value="Personal">Personal</option><option value="Merchant">Merchant</option></select></div>
+          </div>
+          <button class="bsm bp" onclick="saveBkash()" style="padding:.55rem 1.4rem;margin-top:.4rem;">✦ Save Settings</button>
+          <p style="font-size:.82rem;color:var(--soft);font-style:italic;margin-top:1rem;">
+            This number is shown to visitors on the Donate page under "Send Money via bKash". Update it to your organization's real bKash number before going live.
+          </p>
         </div>
       </div>
 

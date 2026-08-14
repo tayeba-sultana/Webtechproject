@@ -56,7 +56,7 @@ function aTab(t,btn){
 
 /* ── REFRESH ADMIN ── */
 function refreshAdmin(){
-  const {members,regs,events,notices,resources,admins} = DB;
+  const {members,regs,events,notices,resources,admins,campaigns,causes,donations,clothDrives,clothPledges,settings} = DB;
   document.getElementById('dM').textContent  = members.length;
   document.getElementById('dR').textContent  = regs.length;
   document.getElementById('dE').textContent  = events.length;
@@ -67,6 +67,19 @@ function refreshAdmin(){
   document.getElementById('bdgR').textContent= regs.length;
   const bdgA = document.getElementById('bdgA');
   if(bdgA) bdgA.textContent = admins.length;
+
+  // donations / cloth stats
+  const verifiedTotal = donations.filter(d=>d.status==='verified').reduce((s,d)=>s+Number(d.amount||0),0);
+  const pendingDon = donations.filter(d=>d.status==='pending').length;
+  const dDon=document.getElementById('dDon'); if(dDon) dDon.textContent='৳'+verifiedTotal.toLocaleString();
+  const dPend=document.getElementById('dPend'); if(dPend) dPend.textContent=pendingDon;
+  const dPledge=document.getElementById('dPledge'); if(dPledge) dPledge.textContent=clothPledges.length;
+  const bdgD=document.getElementById('bdgD'); if(bdgD) bdgD.textContent=pendingDon;
+  const bdgP=document.getElementById('bdgP'); if(bdgP) bdgP.textContent=clothPledges.filter(p=>p.status==='pending').length;
+
+  // bKash settings fields
+  const bkNo=document.getElementById('bkNo'); if(bkNo) bkNo.value=settings.bkashNumber;
+  const bkTy=document.getElementById('bkTy'); if(bkTy) bkTy.value=settings.bkashType;
 
   const all=[...members.map(m=>({...m,_t:'member'})),...regs.map(r=>({...r,_t:'reg'}))].slice(0,6);
   document.getElementById('actLog').innerHTML = all.length
@@ -158,6 +171,110 @@ function refreshAdmin(){
       <td style="max-width:180px;font-size:.82rem;color:var(--soft)">${(r.arabic||r.trans).substring(0,60)}…</td>
       <td><button class="bdel" onclick="delRs('${r.id}')">✕</button></td>
     </tr>`).join('');
+  }
+
+  // campaigns admin table
+  const cptb=document.getElementById('cpAdTb'), cpe=document.getElementById('cpAdEmp');
+  if(cptb){
+    if(!campaigns.length){ cptb.innerHTML=''; cpe.style.display='block'; }
+    else{
+      cpe.style.display='none';
+      cptb.innerHTML=campaigns.map(c=>{
+        const raised = raisedFor(c.id);
+        return `<tr>
+          <td><strong>${c.title}</strong></td>
+          <td><span class="pill pb">${c.type==='event'?'Event':'Activity'}</span></td>
+          <td>৳${c.goal.toLocaleString()}</td>
+          <td>৳${raised.toLocaleString()}</td>
+          <td><span class="pill ${c.status==='active'?'pg':'pr'}">${c.status}</span> <button class="bsm ba" style="padding:.2rem .5rem;font-size:.7rem;margin-left:.3rem" onclick="toggleCampaignStatus('${c.id}')">Toggle</button></td>
+          <td><button class="bdel" onclick="delCampaign('${c.id}')">✕</button></td>
+        </tr>`;
+      }).join('');
+    }
+  }
+
+  // donations table
+  const dtb=document.getElementById('donTb'), de=document.getElementById('donEmp');
+  if(dtb){
+    if(!donations.length){ dtb.innerHTML=''; de.style.display='block'; }
+    else{
+      de.style.display='none';
+      dtb.innerHTML=donations.map((d,i)=>`<tr>
+        <td style="color:var(--soft);font-size:.76rem">${i+1}</td>
+        <td style="font-size:.82rem">${d.targetTitle}</td>
+        <td><strong>${d.name}</strong></td>
+        <td style="font-size:.82rem">${d.phone}</td>
+        <td><span class="pill pb">${d.bkashNumber}</span></td>
+        <td style="font-size:.8rem">${d.trxId}</td>
+        <td><strong>৳${Number(d.amount).toLocaleString()}</strong></td>
+        <td>
+          <span class="pill ${d.status==='verified'?'pg':d.status==='rejected'?'pr':'po'}">${d.status}</span><br>
+          <button class="bapp" onclick="setDonStatus('${d.id}','verified')" style="margin-top:3px">✓ Verify</button>
+          <button class="brej" onclick="setDonStatus('${d.id}','rejected')">✗ Reject</button>
+        </td>
+        <td style="font-size:.74rem;color:#a080c0;white-space:nowrap">${d.time}</td>
+        <td><button class="bdel" onclick="delDon('${d.id}')">✕</button></td>
+      </tr>`).join('');
+    }
+  }
+
+  // donation causes admin table
+  const catb=document.getElementById('caAdTb'), cae=document.getElementById('caAdEmp');
+  if(catb){
+    if(!causes.length){ catb.innerHTML=''; cae.style.display='block'; }
+    else{
+      cae.style.display='none';
+      catb.innerHTML=causes.map(c=>{
+        const raised = raisedFor(c.id);
+        return `<tr>
+          <td><strong>${c.icon||''} ${c.title}</strong></td>
+          <td>৳${c.goal.toLocaleString()}</td>
+          <td>৳${raised.toLocaleString()}</td>
+          <td><span class="pill ${c.status==='active'?'pg':'pr'}">${c.status}</span> <button class="bsm ba" style="padding:.2rem .5rem;font-size:.7rem;margin-left:.3rem" onclick="toggleCauseStatus('${c.id}')">Toggle</button></td>
+          <td><button class="bdel" onclick="delCause('${c.id}')">✕</button></td>
+        </tr>`;
+      }).join('');
+    }
+  }
+
+  // clothes drives admin table
+  const cdtb=document.getElementById('cdAdTb'), cde=document.getElementById('cdAdEmp');
+  if(cdtb){
+    if(!clothDrives.length){ cdtb.innerHTML=''; cde.style.display='block'; }
+    else{
+      cde.style.display='none';
+      cdtb.innerHTML=clothDrives.map(d=>`<tr>
+        <td><strong>${d.title}</strong></td>
+        <td><span class="pill pb">${d.season==='winter'?'❄️ Winter':'☀️ Summer'}</span></td>
+        <td style="font-size:.82rem">${d.dropoff||'—'}</td>
+        <td style="font-size:.82rem">${fmtDate(d.deadline)}</td>
+        <td><span class="pill ${d.status==='active'?'pg':'pr'}">${d.status}</span> <button class="bsm ba" style="padding:.2rem .5rem;font-size:.7rem;margin-left:.3rem" onclick="toggleDriveStatus('${d.id}')">Toggle</button></td>
+        <td><button class="bdel" onclick="delDrive('${d.id}')">✕</button></td>
+      </tr>`).join('');
+    }
+  }
+
+  // clothes pledges table
+  const pltb=document.getElementById('plTb'), ple=document.getElementById('plEmp');
+  if(pltb){
+    if(!clothPledges.length){ pltb.innerHTML=''; ple.style.display='block'; }
+    else{
+      ple.style.display='none';
+      pltb.innerHTML=clothPledges.map((p,i)=>`<tr>
+        <td style="color:var(--soft);font-size:.76rem">${i+1}</td>
+        <td style="font-size:.82rem">${p.driveTitle}</td>
+        <td><strong>${p.name}</strong></td>
+        <td style="font-size:.82rem">${p.phone}</td>
+        <td style="max-width:140px;font-size:.8rem;color:var(--soft)">${p.items}</td>
+        <td style="font-size:.82rem">${p.qty||'—'}</td>
+        <td>
+          <span class="pill ${p.status==='collected'?'pg':'po'}">${p.status}</span><br>
+          <button class="bapp" onclick="setPledgeStatus('${p.id}','collected')" style="margin-top:3px">✓ Collected</button>
+        </td>
+        <td style="font-size:.74rem;color:#a080c0;white-space:nowrap">${p.time}</td>
+        <td><button class="bdel" onclick="delPledge('${p.id}')">✕</button></td>
+      </tr>`).join('');
+    }
   }
 
   // admins table
@@ -259,12 +376,85 @@ function delAdmin(id){
   refreshAdmin();
 }
 
+/* ── FUNDRAISING: CAMPAIGNS ── */
+function addCampaign(){
+  const t=document.getElementById('cpT').value.trim();
+  const g=Number(document.getElementById('cpG').value);
+  if(!t||!g||g<=0){ alert('Title and a valid Goal Amount are required.'); return; }
+  DB.campaigns.push({id:uid(), type:document.getElementById('cpTy').value, title:t, desc:document.getElementById('cpDs').value.trim(), goal:g, status:'active', createdAt:todayStr()});
+  saveDB();
+  ['cpT','cpDs','cpG'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('cpTy').value='activity';
+  refreshAdmin();
+  alert('✦ Fundraising campaign launched!');
+}
+function toggleCampaignStatus(id){ const c=DB.campaigns.find(c=>c.id===id); if(!c) return; c.status = c.status==='active'?'closed':'active'; saveDB(); refreshAdmin(); }
+function delCampaign(id){ if(!confirm('Delete this campaign? (Any donation records will remain.)')) return; DB.campaigns=DB.campaigns.filter(c=>c.id!==id); saveDB(); refreshAdmin(); }
+
+/* ── DONATION CAUSES (Flood / Palestine / Orphanage etc.) ── */
+function addCause(){
+  const t=document.getElementById('caT').value.trim();
+  const g=Number(document.getElementById('caG').value);
+  if(!t||!g||g<=0){ alert('Title and a valid Goal Amount are required.'); return; }
+  DB.causes.push({id:uid(), icon:document.getElementById('caIc').value.trim()||'🤲', title:t, desc:document.getElementById('caDs').value.trim(), goal:g, status:'active', createdAt:todayStr()});
+  saveDB();
+  ['caT','caIc','caDs','caG'].forEach(f=>document.getElementById(f).value='');
+  refreshAdmin();
+  alert('✦ Donation cause added!');
+}
+function toggleCauseStatus(id){ const c=DB.causes.find(c=>c.id===id); if(!c) return; c.status = c.status==='active'?'closed':'active'; saveDB(); refreshAdmin(); }
+function delCause(id){ if(!confirm('Delete this donation cause? (Any donation records will remain.)')) return; DB.causes=DB.causes.filter(c=>c.id!==id); saveDB(); refreshAdmin(); }
+
+/* ── FUNDRAISING: DONATIONS ── */
+function setDonStatus(id,st){ const d=DB.donations.find(d=>d.id===id); if(!d) return; d.status=st; saveDB(); refreshAdmin(); }
+function delDon(id){ if(!confirm('Delete this donation record?')) return; DB.donations=DB.donations.filter(d=>d.id!==id); saveDB(); refreshAdmin(); }
+
+/* ── CLOTHES COLLECTION: DRIVES ── */
+function addClothDrive(){
+  const t=document.getElementById('cdT').value.trim();
+  if(!t){ alert('Drive title is required.'); return; }
+  DB.clothDrives.push({id:uid(), season:document.getElementById('cdSe').value, title:t, desc:document.getElementById('cdDs').value.trim(), dropoff:document.getElementById('cdLo').value.trim(), deadline:document.getElementById('cdDl').value, status:'active'});
+  saveDB();
+  ['cdT','cdDs','cdLo','cdDl'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('cdSe').value='winter';
+  refreshAdmin();
+  alert('✦ Clothes collection drive started!');
+}
+function toggleDriveStatus(id){ const d=DB.clothDrives.find(d=>d.id===id); if(!d) return; d.status = d.status==='active'?'closed':'active'; saveDB(); refreshAdmin(); }
+function delDrive(id){ if(!confirm('Delete this drive?')) return; DB.clothDrives=DB.clothDrives.filter(d=>d.id!==id); saveDB(); refreshAdmin(); }
+
+/* ── CLOTHES COLLECTION: PLEDGES ── */
+function setPledgeStatus(id,st){ const p=DB.clothPledges.find(p=>p.id===id); if(!p) return; p.status=st; saveDB(); refreshAdmin(); }
+function delPledge(id){ if(!confirm('Delete this pledge?')) return; DB.clothPledges=DB.clothPledges.filter(p=>p.id!==id); saveDB(); refreshAdmin(); }
+
+/* ── PAYMENT SETTINGS ── */
+function saveBkash(){
+  const no=document.getElementById('bkNo').value.trim();
+  if(!no){ alert('bKash number is required.'); return; }
+  DB.settings.bkashNumber = no;
+  DB.settings.bkashType = document.getElementById('bkTy').value;
+  saveDB();
+  refreshAdmin();
+  alert('✦ Payment settings saved! This bKash number is now shown on the Donate page.');
+}
+
 /* ── EXPORT CSV ── */
 function expCSV(type){
-  const data=type==='members'?DB.members:DB.regs;
+  let data, h, rows;
+  if(type==='members'){
+    data=DB.members; h=['Member ID','Name','Student ID','Dept','Batch','Why Join','Status','Time'];
+    rows=data.map(d=>[d.mid,d.name,d.sid,d.dept||'',d.batch||'',d.why||'',d.status,d.time]);
+  } else if(type==='regs'){
+    data=DB.regs; h=['Name','Student ID','Dept','Batch','Event','Time'];
+    rows=data.map(d=>[d.name,d.sid,d.dept||'',d.batch||'',d.event,d.time]);
+  } else if(type==='donations'){
+    data=DB.donations; h=['For','Donor Name','Phone','bKash Number','Trx ID','Amount','Status','Time'];
+    rows=data.map(d=>[d.targetTitle,d.name,d.phone,d.bkashNumber,d.trxId,d.amount,d.status,d.time]);
+  } else if(type==='pledges'){
+    data=DB.clothPledges; h=['Drive','Name','Phone','Items','Qty','Status','Time'];
+    rows=data.map(d=>[d.driveTitle,d.name,d.phone,d.items,d.qty||'',d.status,d.time]);
+  } else return;
   if(!data.length){ alert('No data to export.'); return; }
-  const h=type==='members'?['Member ID','Name','Student ID','Dept','Batch','Why Join','Status','Time']:['Name','Student ID','Dept','Batch','Event','Time'];
-  const rows=data.map(d=>type==='members'?[d.mid,d.name,d.sid,d.dept||'',d.batch||'',d.why||'',d.status,d.time]:[d.name,d.sid,d.dept||'',d.batch||'',d.event,d.time]);
   const csv=[h,...rows].map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`sec_${type}_${Date.now()}.csv`; a.click();
 }
