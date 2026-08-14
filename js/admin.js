@@ -17,7 +17,9 @@ function findAdminByUsername(username){
 
 function showLogin(){
   currentAdmin = null;
-  document.getElementById('aLog').style.display='block';
+  document.getElementById('aLog').style.display='flex';
+  // document.getElementById('aLog').style.display='block';
+  document.getElementById('aLog').style.display='flex';
   document.getElementById('aPanel').style.display='none';
   document.getElementById('aUser').value='';
   document.getElementById('aPass').value='';
