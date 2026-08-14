@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEC Muslimah Community — Join Us</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <span style="font-size:1.3rem">🌙</span>
+    <div class="nav-logo">SEC <span>Muslimah</span></div>
+  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="events.html">Events</a></li>
+    <li><a href="notices.html">Notices</a></li>
+    <li><a href="resources.html">Resources</a></li>
+    <li><a href="join.html">Join Us</a></li>
+  </ul>
+  <button class="hbg" id="hamburger"><span></span><span></span><span></span></button>
+</nav>
+
+<section class="sec" id="join" style="padding-top:8rem;">
+  <div class="jw">
+    <div class="sh"><p class="stag">Become a Member</p><h2 class="stitle">Join Our Sisterhood</h2><p class="sital">A step towards faith begins here</p><hr class="sdiv"></div>
+    <div class="jform" id="jFormArea">
+      <div class="fg"><label class="fl">Full Name</label><input class="fi" id="jN" placeholder="Your full name"></div>
+      <div class="fg"><label class="fl">Student ID</label><input class="fi" id="jS" placeholder="e.g. SEC-2024-001"></div>
+      <div class="fg"><label class="fl">Department</label><select class="fi" id="jD"><option value="">Select Department</option><option>Computer Science & Engineering</option><option>Electrical & Electronic Engineering</option><option>Civil Engineering</option><option>Mechanical Engineering</option><option>Architecture</option><option>Other</option></select></div>
+      <div class="fg"><label class="fl">Batch / Year</label><input class="fi" id="jBa" placeholder="e.g. 2023 / 2nd Year"></div>
+      <div class="fg"><label class="fl">Why do you want to join? (optional)</label><textarea class="fi" id="jW" rows="3" placeholder="Share your intention..."></textarea></div>
+      <button class="btn-g bfull" onclick="submitJoin()">✦ Submit Membership Request</button>
+    </div>
+    <div class="jsucc" id="jSucc">
+      <p style="font-size:2.5rem;margin-bottom:.8rem">🌸</p>
+      <h3 style="font-family:'Playfair Display',serif;color:var(--gl);font-size:1.5rem;margin-bottom:.5rem">Welcome to the Sisterhood!</h3>
+      <p style="color:rgba(255,255,255,.7);font-style:italic;margin-bottom:1.5rem">Your request is submitted. Your Member ID is:</p>
+      <div class="jcard">
+        <div class="jmid" id="jMidShow">SMC-0001</div>
+        <div class="jmname" id="jNameShow"></div>
+        <div class="jnote">✦ Please save your Member ID.<br>Admin will confirm your membership soon, in sha Allah.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="flogo">SEC <span>Muslimah Community</span></div>
+  <p>Sylhet Engineering College · Non-political · Female Students Only</p>
+  <p>Deen · Dawah · Righteous Learning</p>
+  <p class="fv">✦ Together in Faith, Stronger in Purpose ✦</p>
+</footer>
+
+<a class="afab" href="admin.html" title="Admin Panel">🔐</a>
+<div class="afab-tip">Admin Panel</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

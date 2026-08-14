@@ -1,11 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEC Muslimah Community — Events</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    
+
+<nav>
+  <div class="nav-brand">
+    <span style="font-size:1.3rem">🌙</span>
+    <div class="nav-logo">SEC <span>Muslimah</span></div>
+  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="events.html">Events</a></li>
+    <li><a href="notices.html">Notices</a></li>
+    <li><a href="resources.html">Resources</a></li>
+    <li><a href="join.html">Join Us</a></li>
+  </ul>
+  <button class="hbg" id="hamburger"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="pghero">
+  <p class="stag">Programs & Gatherings</p>
+  <h2 class="stitle">Upcoming Events</h2>
+  <p class="sital">Register your spot — limited seats available</p>
+</div>
+
+<section class="sec" id="events">
+  <div class="si">
+    <div class="egrid" id="evGrid"></div>
+  </div>
+</section>
+
+<!-- REG MODAL -->
+<div class="mov" id="regMov">
+  <div class="modal">
+    <button class="mcl" onclick="closeReg()">✕</button>
+    <div id="regF">
+      <h3 class="mtit">Event Registration</h3>
+      <p class="msub" id="regEvName"></p>
+      <div class="fg"><label class="fl">Full Name</label><input class="fi" id="rN" placeholder="Your name"></div>
+      <div class="fg"><label class="fl">Student ID</label><input class="fi" id="rS" placeholder="e.g. SEC-2024-001"></div>
+      <div class="fg"><label class="fl">Department</label><select class="fi" id="rD"><option value="">Select</option><option>Computer Science & Engineering</option><option>Electrical & Electronic Engineering</option><option>Civil Engineering</option><option>Mechanical Engineering</option><option>Architecture</option><option>Other</option></select></div>
+      <div class="fg"><label class="fl">Batch / Year</label><input class="fi" id="rB" placeholder="e.g. 2023 / 2nd Year"></div>
+      <button class="btn-g bfull" onclick="submitReg()">✦ Confirm Registration</button>
+    </div>
+    <div class="rsucc" id="regSucc">
+      <div style="font-size:2.5rem;margin-bottom:.8rem">🌸</div>
+      <p style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--deep);font-weight:700">Registration Successful!</p>
+      <p style="color:var(--soft);font-style:italic;margin-top:.4rem">JazakAllahu Khairan — see you there, in sha Allah!</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="flogo">SEC <span>Muslimah Community</span></div>
+  <p>Sylhet Engineering College · Non-political · Female Students Only</p>
+  <p>Deen · Dawah · Righteous Learning</p>
+  <p class="fv">✦ Together in Faith, Stronger in Purpose ✦</p>
+</footer>
+
+<a class="afab" href="admin.html" title="Admin Panel">🔐</a>
+<div class="afab-tip">Admin Panel</div>
+
+<script src="js/app.js"></script>
 </body>
 </html>
